@@ -1,0 +1,28 @@
+from typing import Literal
+
+from lagrange.info import AppInfo
+
+def create_app_info(protocol: Literal['linux', 'macos', 'windows'] = 'linux',
+                    version: int = 30366) -> AppInfo:
+    return app_list[protocol]
+
+AppInfo(
+    os='Linux',
+    kernel='Linux',
+    vendor_os='linux',
+    current_version='3.2.15-30366',
+    build_version=30366,
+    misc_bitmap=32764,
+    pt_version='2.0.0',
+    pt_os_version=19,
+    package_name='com.tencent.qq',
+    wtlogin_sdk='nt.wtlogin.0.0.1',
+    package_sign='V1_LNX_NQ_3.2.15-30366_RDM_B',
+    app_id=1600001615,
+    sub_app_id=537258424,
+    app_id_qrcode=13697054,
+    app_client_version=30366,
+    main_sigmap=169742560,
+    sub_sigmap=0,
+    nt_login_type=1,
+)

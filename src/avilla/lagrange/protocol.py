@@ -1,4 +1,5 @@
 import os
+from collections.abc import Callable, Awaitable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
@@ -6,7 +7,9 @@ from typing import Literal
 from avilla.core import Avilla
 from avilla.core.protocol import ProtocolConfig, BaseProtocol
 from graia.ryanvk import merge, ref
-from lagrange.info import DeviceInfo, SigInfo
+from lagrange.info import DeviceInfo, SigInfo, AppInfo
+from lagrange.info.app import app_list
+from typing_extensions import Self
 
 from .client import LagrangeClientService
 from .const import SIGN_SEQ, SIGN_URL
@@ -21,6 +24,21 @@ class LagrangeGlobalConfig(ProtocolConfig):
 
 
 @dataclass
+class LagrangeSignConfig:
+    app_info: AppInfo
+    provider: Callable[[str, int, bytes], Awaitable[dict]]
+    
+    # @classmethod
+    # def from_url(cls, url: str, app_info: AppInfo | None = None) -> Self:
+    #     if app_info is None:
+    #         try:
+    #             v = (url.rsplit('/', 1)[-1])
+    #         except:
+    #             ...
+    #     return cls(app_info, lambda cmd, seq, buf: provider(url, cmd, seq, buf))
+
+
+@dataclass
 class LagrangeConfig(ProtocolConfig):
     uin: int
     protocol: Literal['linux', 'macos', 'windows'] = 'linux'
@@ -29,6 +47,7 @@ class LagrangeConfig(ProtocolConfig):
     sig_info_path: os.PathLike[str] | str = './sig.bin'
     device_info: DeviceInfo | None = None
     sig_info: SigInfo | None = None
+    app_info: AppInfo = app_list['linux']
 
     def __post_init__(self):
         # Check if info is pre-defined (use temp path instead)
@@ -36,6 +55,8 @@ class LagrangeConfig(ProtocolConfig):
             self.device_info_path = ''
         if self.sig_info:
             self.sig_info_path = ''
+        # Update app info
+        self.app_info = app_list[self.protocol]
 
     def read_info(self, force: bool = False) -> tuple[DeviceInfo, SigInfo]:
         if self.device_info and not force:
